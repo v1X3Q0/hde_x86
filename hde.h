@@ -23,6 +23,10 @@ typedef enum
     e_disp=e_imm<<1,
 } val_set_t;
 
+#define X86_2OPCMD(op1, op2)    ((uint16_t)(op1 | (op2 << 0x10)))
+
+#define CONDJMP_1       0x0f
+#define CONDJMP_2       0x84
 #define MOV_RR          0x8b
 #define SHR_RI          0xc1
 #define LEA_RRI         0x8d
@@ -31,6 +35,12 @@ typedef enum
 #define MOV_RADDR_R     0x89
 #define CALL_I          0xe8
 #define CALL_DREFREL    0xff
+// one or two byte push
+#define PUSH_R          0x50
+#define POP_R           0x58
+
+#define RETURN_x86      0xc3
+
 // len 0xa
 // rax is rex_w
 
@@ -59,8 +69,15 @@ typedef enum
 
 typedef struct {
     uint8_t len;
-    uint8_t opcode1;
-    uint8_t opcode2;
+    union
+    {
+        struct
+        {
+            uint8_t opcode1;
+            uint8_t opcode2;
+        };
+        uint16_t opcode;        
+    };
     uint8_t reg_src1;
     uint8_t reg_src2;
     uint8_t reg_dst1;

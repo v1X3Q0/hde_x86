@@ -13,3 +13,13 @@ if(ARCH MATCHES "AMD64" OR ARCH MATCHES "i386" OR ARCH MATCHES "x86_64")
         ${LOCAL_SOURCE_DIR}/hde64.c
         ${LOCAL_SOURCE_DIR}/main.cpp)
 endif()
+
+if (DEFINED ANDROID_TOOL_BASE)
+    add_executable(${PROJECT_NAME}.x hde_exe.c)
+
+    target_include_directories(${PROJECT_NAME}.x PRIVATE
+        ${ANDROID_TOOL_BASE}/common/local_util)
+
+    target_link_libraries(${PROJECT_NAME}.x PRIVATE
+        ${PROJECT_NAME} localUtil)
+endif()
