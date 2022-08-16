@@ -1,10 +1,15 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 
 #include <localUtil.h>
 
+#ifdef _WIN32
+#include <localUtil_windows.h>
+#include <getopt.h>
+#elif defined(__linux__)
+#include <unistd.h>
 #include <elf.h>
+#endif
 
 #include "hde.h"
 
@@ -12,34 +17,6 @@ void usage(const char* argv)
 {
     printf("usage: %s [-v] [-m] disasm_file offset\n", argv);
     exit(0);
-}
-
-int virt_to_file(char* procBase, int offset, int* offset_out)
-{
-    int result = -1;
-    Elf64_Ehdr* ehdr = 0;
-    Elf64_Phdr* phdr = 0;
-    int i = 0;
-    int offset_tracked = 0;
-
-    ehdr = (Elf64_Ehdr*)(procBase);
-    phdr = (Elf64_Phdr*)(procBase + ehdr->e_phoff);
-
-    for (i = 0; i < ehdr->e_phnum; i++)
-    {
-        FINISH_IF(REGION_CONTAINS(phdr[i].p_vaddr, phdr[i].p_memsz, offset) == 1);        
-    }
-
-    goto fail;
-finish:
-    result = 0;
-    if (offset_out != 0)
-    {
-        *offset_out = (offset - phdr[i].p_vaddr) + phdr[i].p_offset;
-    }
-
-fail:
-    return result;
 }
 
 void dump_hde64s(hde64s* hs)

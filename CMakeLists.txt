@@ -16,8 +16,17 @@ endif()
 
 add_executable(${PROJECT_NAME}.x hde_exe.c)
 
-target_include_directories(${PROJECT_NAME}.x PRIVATE
-    ${ANDROID_TOOL_BASE}/common/local_util)
+set(INCLUDE_LIST ${ANDROID_TOOL_BASE}/common/local_util)
 
-target_link_libraries(${PROJECT_NAME}.x PRIVATE
-    ${PROJECT_NAME} localUtil)
+set(LINK_LIST ${PROJECT_NAME} localUtil)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    find_package(getopt_for_windows)
+    list(APPEND INCLUDE_LIST ${getopt_for_windows_INCLUDE_DIR})
+    target_link_directories(${PROJECT_NAME}.x PRIVATE ${getopt_for_windows_LIB_DIR})
+    list(APPEND LINK_LIST getopt_for_windows_static)
+endif()
+
+target_include_directories(${PROJECT_NAME}.x PRIVATE ${INCLUDE_LIST})
+
+target_link_libraries(${PROJECT_NAME}.x PRIVATE ${LINK_LIST})
