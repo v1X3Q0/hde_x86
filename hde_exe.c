@@ -7,6 +7,7 @@
 #include <localUtil_windows.h>
 #include <getopt.h>
 #elif defined(__linux__)
+#include <localUtil_linux.h>
 #include <unistd.h>
 #include <elf.h>
 #endif
@@ -65,7 +66,7 @@ int main(int argc, char** argv)
     size_t fSize = 0;
     int isVirt = 0;
     int is32bit = 0;
-    int offset = 0;
+    size_t offset = 0;
     hde64s hs = { 0 };
 
     while ((opt = getopt(argc, argv, "vm")) != -1)
@@ -108,7 +109,7 @@ int main(int argc, char** argv)
     if (isVirt == 1)
     {
         SAFE_PAIL(virt_to_file(allocBase, offset, &offset) == -1, "translation failed\n");
-        printf("provided with virt, translated to 0x%08x\n", offset);
+        printf("provided with virt, translated to 0x%016lx\n", offset);
     }
 
     SAFE_PAIL(hde64_disasm((const void*)((size_t)allocBase + offset), &hs) == 0, "disasm failed\n");
