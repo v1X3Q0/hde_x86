@@ -21,7 +21,7 @@ typedef enum
     e_addrmode=e_regsz<<1,
     e_imm=e_addrmode<<1,
     e_disp=e_imm<<1,
-} val_set_t;
+} val_set_X86_t;
 
 #define X86_2OPCMD(op1, op2)    ((uint16_t)(op1 | (op2 << 0x10)))
 
