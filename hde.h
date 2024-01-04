@@ -1,29 +1,13 @@
 #ifndef HDE_H
 #define HDE_H
 
-#if defined(__LP64__) || defined(__x86_64__) || defined(_M_X64)
+#define VAL_SET_REGMASK 0
+#define X86_2OPCMD(op1, op2)    ((uint16_t)(op1 | (op2 << 0x10)))
+
+#if defined(__LP64__) || defined(__x86_64__) || defined(_M_X64) || defined(FORCE_X86_64)
 #include "minfuncfind/hde64.h"
 #define hde hde64s
 #define hde_disasm hde64_disasm
-
-#define VAL_SET_REGMASK 0
-
-typedef enum
-{
-    e_len=1,
-    e_reg_src1=e_len<<1,
-    e_reg_src2=e_reg_src1<<1,
-    e_reg_dst1=e_reg_src2<<1,
-    e_reg_dst2=e_reg_dst1<<1,
-    e_opcode1=e_reg_dst2<<1,
-    e_opcode2=e_opcode1<<1,
-    e_regsz=e_opcode2<<1,
-    e_addrmode=e_regsz<<1,
-    e_imm=e_addrmode<<1,
-    e_disp=e_imm<<1,
-} val_set_X86_t;
-
-#define X86_2OPCMD(op1, op2)    ((uint16_t)(op1 | (op2 << 0x10)))
 
 #define CONDJMP_1       0x0f
 #define CONDJMP_2       0x84
@@ -66,6 +50,26 @@ typedef enum
 #define R13     13
 #define R14     14
 #define R15     15
+#else
+#include "minfuncfind/hde32.h"
+#define hde hde32s
+#define hde_disasm hde32_disasm
+#endif
+
+typedef enum
+{
+    e_len=1,
+    e_reg_src1=e_len<<1,
+    e_reg_src2=e_reg_src1<<1,
+    e_reg_dst1=e_reg_src2<<1,
+    e_reg_dst2=e_reg_dst1<<1,
+    e_opcode1=e_reg_dst2<<1,
+    e_opcode2=e_opcode1<<1,
+    e_regsz=e_opcode2<<1,
+    e_addrmode=e_regsz<<1,
+    e_imm=e_addrmode<<1,
+    e_disp=e_imm<<1,
+} val_set_X86_t;
 
 typedef struct {
     uint8_t len;
@@ -95,12 +99,6 @@ extern "C"
 int parseInst(uint8_t* pc, hde64s_t* instTemp);
 #ifdef __cplusplus
 }
-#endif
-
-#else
-#include "minfuncfind/hde32.h"
-#define hde hde32s
-#define hde_disasm hde32_disasm
 #endif
 
 #endif

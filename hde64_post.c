@@ -1,5 +1,6 @@
-#include "hde.h"
 #include <string.h>
+#define FORCE_X86_64 1
+#include "hde.h"
 
 int parseInst(uint8_t* pc, hde64s_t* instOut)
 {
