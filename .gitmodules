@@ -1,0 +1,3 @@
+[submodule "common/local_util"]
+	path = common/local_util
+	url = https://github.com/v1X3Q0/local_util.git
