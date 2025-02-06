@@ -3,6 +3,8 @@ project(hde_x86)
 if(NOT DEFINED ANDROID_TOOL_BASE)
     message("no ANDROID_TOOL_BASE, setting to working directory")
     set(ANDROID_TOOL_BASE ${CMAKE_CURRENT_SOURCE_DIR})
+
+    add_subdirectory(common/local_util)
 endif()
 
 set(LOCAL_SOURCE_DIR minfuncfind)

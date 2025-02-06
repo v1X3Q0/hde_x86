@@ -6,10 +6,10 @@
 #include <string>
 #include <cstdint>
 
-#if defined(__x86_64__) || defined(_M_X64)
+#if defined(__LP64__)
 #include "hde64.h"
 const char app_name[] = "minfuncfind64";
-#elif defined(__i386) || defined(_M_IX86)
+#else
 #include "hde32.h"
 const char app_name[] = "minfuncfind32";
 #endif
@@ -19,8 +19,8 @@ const char app_name[] = "minfuncfind32";
 #define IS_RET(hde) (hde.opcode == 0xC3||hde.opcode == 0xCB||hde.opcode == 0xC2||hde.opcode == 0xCA)
 #define PATTERN_TARGET_LENGTH 50 // The approximate length it will aim for.
 
-std::vector<std::pair<std::string, uint>> funcs; // func_name, address
-std::vector<std::pair<std::string, std::string>> patterns; // pattern, mask
+std::vector<std::pair<std::string, uint> > funcs; // func_name, address
+std::vector<std::pair<std::string, std::string> > patterns; // pattern, mask
 
 // For when we have an address and want to know exactly where it is
 // so we know where to apply the mask.
@@ -45,11 +45,16 @@ static int findValue(void* target, uint32_t value, int size) {
   return -1;
 }
 
-#if defined(__x86_64__) || defined(_M_X64)
-static int findValue(void* target, uint64_t value, int size) {
+#if defined(__LP64__)
+static int findValue(void *target, uint64_t value, int size)
+{
   for (int i = 0; i < size; i++)
-    if (*(uint64_t*)((uint)target + i) == value) return i;
-
+  {
+    if (*(uint64_t *)((uint)target + i) == value)
+    {
+      return i;
+    }
+  }
   return -1;
 }
 #endif
@@ -117,17 +122,17 @@ int main(int argc, char* argv[]) {
   for (auto it = funcs.begin(); it != funcs.end(); ++it) {
     std::cout << "Generating pattern and mask for " << it->first << " at 0x" << std::setw(8) << it->second << "..." << std::endl;
 
-#if defined(__x86_64__) || defined(_M_X64)
+#if defined(__LP64__)
     hde64s hde;
-#elif defined(__i386) || defined(_M_IX86)
+#else
     hde32s hde;
 #endif
 
     uint current = (uint)buffer + it->second;
     //std::cout << "CURRENT: 0x" << std::hex << std::setfill('0') << std::setw(sizeof(int) * 2) << (uint)current - (uint)buffer << std::endl;
-#if defined(__x86_64__) || defined(_M_X64)
+#if defined(__LP64__)
     uint length = hde64_disasm((void*)current, &hde);
-#elif defined(__i386) || defined(_M_IX86)
+#else
     uint length = hde32_disasm((void*)current, &hde);
 #endif
 
@@ -135,7 +140,7 @@ int main(int argc, char* argv[]) {
       uint8_t addr8;
       uint16_t addr16;
       uint32_t addr32;
-#if defined(__x86_64__) || defined(_M_X64)
+#if defined(__LP64__)
       uint64_t addr64;
 #endif
     } value;
@@ -180,7 +185,7 @@ int main(int argc, char* argv[]) {
           value_length = 4;
           pos = findValue((void*)current, value.addr32, hde.len);
         }
-#if defined(__x86_64__) || defined(_M_X64)
+#if defined(__LP64__)
         else if (hde.flags & F_IMM64) {
           got_value = true;
           value.addr64 = hde.imm.imm64;
@@ -220,9 +225,9 @@ int main(int argc, char* argv[]) {
       }
       
       current += hde.len;
-#if defined(__x86_64__) || defined(_M_X64)
+#if defined(__LP64__)
       length += hde64_disasm((void*)current, &hde);
-#elif defined(__i386) || defined(_M_IX86)
+#else
       length += hde32_disasm((void*)current, &hde);
 #endif
     }

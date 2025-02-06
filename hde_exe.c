@@ -10,6 +10,9 @@
 #include <localUtil_linux.h>
 #include <unistd.h>
 #include <elf.h>
+#elif defined(__APPLE__)
+#include <localUtil_xnu.h>
+#include <unistd.h>
 #endif
 
 #include "hde.h"
